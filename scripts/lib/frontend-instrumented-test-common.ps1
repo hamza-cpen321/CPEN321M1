@@ -4,7 +4,7 @@ Shared helpers for frontend instrumented test runners (E2E + NFR).
 Dot-source after setting $Root and $FrontendDir.
 
 Expected layout:
-  frontend\app\src\test\...\{e2e,nfr}\
+  frontend\app\src\androidTest\...\{e2e,nfr}\
   frontend\app\build.gradle[.kts]
 #>
 
@@ -52,7 +52,7 @@ function Pick-GradleBuildFile($dir) {
 }
 
 function Resolve-TestRoot {
-    $script:TestRoot = Join-Path $FrontendDir 'app\src\test'
+    $script:TestRoot = Join-Path $FrontendDir 'app\src\androidTest'
     if (-not (Test-Path $script:TestRoot)) { Die "Cannot find $($script:TestRoot)." }
     $script:GradleTask = ':app:connectedDebugAndroidTest'
     $script:AppBuild = Pick-GradleBuildFile (Join-Path $FrontendDir 'app')
@@ -121,7 +121,7 @@ function Run-InstrumentedTests($suite) {
     Discover-TestFiles $subdir
 
     if ($script:TestFiles.Count -eq 0) {
-        Warn "Skipping frontend ${label} tests: no *.kt files in app\src\test\...\${subdir}\."
+        Warn "Skipping frontend ${label} tests: no *.kt files in app\src\androidTest\...\${subdir}\."
         exit 0
     }
 

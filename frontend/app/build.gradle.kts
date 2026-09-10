@@ -1,5 +1,4 @@
 import java.util.Properties
-import org.gradle.api.tasks.util.PatternFilterable
 
 plugins {
     alias(libs.plugins.android.application)
@@ -21,13 +20,6 @@ fun localProperty(name: String, default: String = ""): String =
 android {
     namespace = "com.example.cpen321application"
     compileSdk = libs.versions.compileSdk.get().toInt()
-
-    sourceSets {
-        // e2e + nfr live under src/test and should compile as instrumented tests.
-        getByName("androidTest") {
-            java.srcDir("src/test/java")
-        }
-    }
 
     defaultConfig {
         applicationId = "com.example.cpen321application"
@@ -76,16 +68,6 @@ android {
 // JDK if it is missing (see the foojay resolver in settings.gradle.kts).
 kotlin {
     jvmToolchain(17)
-}
-
-// AGP's public source-set API has no exclude(). Filter Kotlin compile tasks
-// so e2e/nfr are instrumented-only and unit/ stays on the host JVM.
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    val filterable = this as PatternFilterable
-    when {
-        name.contains("UnitTest") -> filterable.exclude("**/e2e/**", "**/nfr/**")
-        name.contains("AndroidTest") -> filterable.exclude("**/unit/**")
-    }
 }
 
 dependencies {

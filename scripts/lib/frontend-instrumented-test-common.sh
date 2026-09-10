@@ -4,7 +4,7 @@
 # Source after setting ROOT and FRONTEND_DIR.
 #
 # Expected layout:
-#   frontend/app/src/test/.../{e2e,nfr}/
+#   frontend/app/src/androidTest/.../{e2e,nfr}/
 #   frontend/app/build.gradle[.kts]
 
 : "${ROOT:?ROOT must be set}"
@@ -35,7 +35,7 @@ pick_gradle_build_file() {
 }
 
 resolve_test_root() {
-  TEST_ROOT="$FRONTEND_DIR/app/src/test"
+  TEST_ROOT="$FRONTEND_DIR/app/src/androidTest"
   [[ -d "$TEST_ROOT" ]] || die "Cannot find $TEST_ROOT."
   GRADLE_TASK=":app:connectedDebugAndroidTest"
   APP_BUILD="$(pick_gradle_build_file "$FRONTEND_DIR/app")"
@@ -98,7 +98,7 @@ run_instrumented_tests() {
   discover_test_files "$subdir"
 
   if ((${#TEST_FILES[@]} == 0)); then
-    warn "Skipping frontend ${label} tests: no *.kt files in app/src/test/.../${subdir}/."
+    warn "Skipping frontend ${label} tests: no *.kt files in app/src/androidTest/.../${subdir}/."
     exit 0
   fi
 

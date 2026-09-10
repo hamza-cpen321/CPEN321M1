@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 <#
-Run frontend E2E tests (src/test/.../e2e/*.kt).
+Run frontend E2E tests (app/src/androidTest/.../e2e/*.kt).
 
 Prerequisites: sign in inside the app on the emulator, then press Enter when prompted.
 Usage: .\scripts\run-frontend-e2e-tests.ps1

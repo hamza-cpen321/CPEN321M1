@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Run frontend NFR tests (src/test/.../nfr/*.kt).
+# Run frontend NFR tests (app/src/androidTest/.../nfr/*.kt).
 #
 # Prerequisites: sign in inside the app on the emulator, then press Enter when prompted.
 # Usage: ./scripts/run-frontend-nfr-tests.sh
