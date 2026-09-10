@@ -21,22 +21,105 @@ import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
+
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialCustomException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import java.security.SecureRandom
+import java.util.Base64
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+const val TAG = "MainActivity"
+
+//class MainActivity : ComponentActivity() {
+//    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//        //replace with your own web client ID from Google Cloud Console
+//        val webClientId = "YOUR_CLIENT_ID_HERE"
+//
+//        setContent {
+//            //ExampleTheme - this is derived from the name of the project not any added library
+//            //e.g. if this project was named "Testing" it would be generated as TestingTheme
+//            CPEN321ApplicationTheme {
+//                Surface(
+//                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background,
+//                ) {
+//                    //This will trigger on launch
+//                    BottomSheet(webClientId)
+//                }
+//            }
+//        }
+//    }
+//}
+
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val webClientId = "254516310392-hvpmhpee3au6ke44ohcjpln1m827fobt.apps.googleusercontent.com"
+
         setContent {
             CPEN321ApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        apiBaseUrl = BuildConfig.API_BASE_URL,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Column (
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                        Greeting(
+                            apiBaseUrl = BuildConfig.API_BASE_URL,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                        Row {
+//                            Button(onClick = {}) { Text("Login + Server") }
+                            ButtonUI(webClientId)
+                        }
+                        Row {
+                            Button(onClick = {}) { Text("Live Updates") }
+                        }
+                        Row {
+                            Button(onClick = {}) { Text("Timer") }
+                        }
+
+                    }
                 }
+
             }
         }
     }
 }
+
 
 @Composable
 fun Greeting(apiBaseUrl: String, modifier: Modifier = Modifier) {
@@ -74,4 +157,122 @@ private suspend fun fetchHealthStatus(apiBaseUrl: String): String = withContext(
     } catch (e: Exception) {
         "Backend unreachable ($healthUrl): ${e.message ?: e.javaClass.simpleName}"
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+@Composable
+fun BottomSheet(webClientId: String) {
+    val context = LocalContext.current
+
+    // LaunchedEffect is used to run a suspend function when the composable is first launched.
+    LaunchedEffect(Unit) {
+        // Create a Google ID option with filtering by authorized accounts enabled.
+        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(true)
+            .setServerClientId(webClientId)
+            .setNonce(generateSecureRandomNonce())
+            .build()
+
+        // Create a credential request with the Google ID option.
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        // Attempt to sign in with the created request using an authorized account
+        val e = signIn(request, context)
+        // If the sign-in fails with NoCredentialException,  there are no authorized accounts.
+        // In this case, we attempt to sign in again with filtering disabled.
+        if (e is NoCredentialException) {
+            val googleIdOptionFalse: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(webClientId)
+                .setNonce(generateSecureRandomNonce())
+                .build()
+
+            val requestFalse: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOptionFalse)
+                .build()
+
+            //We will build out this function in a moment
+            signIn(requestFalse, context)
+        }
+    }
+}
+
+//This function is used to generate a secure nonce to pass in with our request
+fun generateSecureRandomNonce(byteLength: Int = 32): String {
+    val randomBytes = ByteArray(byteLength)
+    SecureRandom.getInstanceStrong().nextBytes(randomBytes)
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes)
+}
+
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+suspend fun signIn(request: GetCredentialRequest, context: Context): Exception? {
+    val credentialManager = CredentialManager.create(context)
+    val failureMessage = "Sign in failed!"
+    //using delay() here helps prevent NoCredentialException when the BottomSheet Flow is triggered
+    //on the initial running of our app
+    delay(250)
+    return try {
+        // The getCredential is called to request a credential from Credential Manager.
+        val result = credentialManager.getCredential(
+            request = request,
+            context = context,
+        )
+        Log.i(TAG, result.toString())
+
+        val credential = result.credential
+        if (credential is CustomCredential &&
+            credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            Log.i(TAG, "Signed in as: ${googleIdTokenCredential.id}")
+        }
+
+        Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
+        Log.i(TAG, "(☞ﾟヮﾟ)☞  Sign in Successful!  ☜(ﾟヮﾟ☜)")
+        null
+    } catch (e: GoogleIdTokenParsingException) {
+        Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, failureMessage + ": Issue with parsing received GoogleIdToken", e)
+        e
+    } catch (e: NoCredentialException) {
+        Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, failureMessage + ": No credentials found", e)
+        e
+    } catch (e: GetCredentialCancellationException) {
+        Toast.makeText(context, "Sign-in cancelled", Toast.LENGTH_SHORT).show()
+        Log.e(TAG, failureMessage + ": Sign-in was cancelled", e)
+        e
+    } catch (e: GetCredentialCustomException) {
+        Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, failureMessage + ": Issue with custom credential request", e)
+        e
+    } catch (e: GetCredentialException) {
+        Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+        Log.e(TAG, failureMessage + ": Failure getting credentials", e)
+        e
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+@Composable
+fun ButtonUI(webClientId: String) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val onClick: () -> Unit = {
+        val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption
+            .Builder(serverClientId = webClientId)
+            .setNonce(generateSecureRandomNonce())
+            .build()
+
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(signInWithGoogleOption)
+            .build()
+
+        coroutineScope.launch {
+            signIn(request, context)
+        }
+    }
+    Button(onClick) {Text("Login")}
 }
