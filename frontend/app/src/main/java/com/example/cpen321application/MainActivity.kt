@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                             ButtonUI2()
                         }
                         Row {
-                            Button(onClick = {}) { Text("Timer") }
+                            ButtonUI3()
                         }
                     }
                 }
@@ -298,6 +298,23 @@ fun ButtonUI2() {
 
     }
     Button(onClick) {Text("Live Updates")}
+
+}
+
+@Composable
+fun ButtonUI3() {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val onClick: () -> Unit = {
+
+        coroutineScope.launch {
+            val intent = Intent(context, MainActivity4::class.java)
+            context.startActivity(intent)
+        }
+
+    }
+    Button(onClick) {Text("Timer")}
 
 }
 

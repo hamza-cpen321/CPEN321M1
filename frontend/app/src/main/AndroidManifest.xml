@@ -37,6 +37,12 @@
             android:label="@string/title_activity_main3"
             android:theme="@style/Theme.CPEN321Application"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".MainActivity4"
+            android:exported="false"
+            android:label="@string/title_activity_main4"
+            android:theme="@style/Theme.CPEN321Application"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

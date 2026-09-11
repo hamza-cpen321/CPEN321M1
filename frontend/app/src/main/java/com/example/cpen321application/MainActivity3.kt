@@ -116,7 +116,6 @@ class MainActivity3 : ComponentActivity() {
                         Row {
                             Button(onClick = { Log.i(TAG, "test")}) { Text("test") }
                         }
-                        
                     }
                 }
             }
