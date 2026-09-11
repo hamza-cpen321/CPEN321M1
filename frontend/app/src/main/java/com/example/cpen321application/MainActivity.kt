@@ -48,11 +48,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.WebSocket
-import okhttp3.WebSocketListener
-import okio.ByteString
+
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.SecureRandom
@@ -95,10 +91,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             CPEN321ApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column (
+                    Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                    ) {
                         Greeting(
                             apiBaseUrl = BuildConfig.API_BASE_URL,
                             modifier = Modifier.padding(innerPadding)
@@ -113,40 +109,14 @@ class MainActivity : ComponentActivity() {
                         Row {
                             Button(onClick = {}) { Text("Timer") }
                         }
-                        Row {
-
-                        }
-
-                        val client = OkHttpClient()
-                        val request = Request.Builder()
-                            .url("ws://10.0.2.2:8080")
-                            .build()
-                        val listener = EchoWebSocketListener()
-                        val webSocket = client.newWebSocket(request, listener)
-                        Row {
-                            Button(onClick = {webSocket.send("Hello")}) { Text("Send Message") }
-                        }
-
                     }
                 }
 
             }
         }
     }
-
-    class EchoWebSocketListener : WebSocketListener() {
-        var data: String = ""
-
-        override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            //data = bytes
-            data = bytes.toString()
-        }
-
-        fun log_data(): String{
-            return data
-        }
-    }
 }
+
 
 @Composable
 fun Greeting(apiBaseUrl: String, modifier: Modifier = Modifier) {
@@ -322,7 +292,7 @@ fun ButtonUI2() {
     val onClick: () -> Unit = {
 
         coroutineScope.launch {
-            val intent = Intent(context, MainActivity2::class.java)
+            val intent = Intent(context, MainActivity3::class.java)
             context.startActivity(intent)
         }
 
