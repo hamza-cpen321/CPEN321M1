@@ -1,11 +1,25 @@
 package com.example.cpen321application
 
+import android.R
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,35 +27,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import com.example.cpen321application.ui.theme.CPEN321ApplicationTheme
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-
-import androidx.compose.material3.Button
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.ui.Alignment
-
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -49,14 +39,25 @@ import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialCustomException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
+import com.example.cpen321application.ui.theme.CPEN321ApplicationTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import java.security.SecureRandom
-import java.util.Base64
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okio.ByteString
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.SecureRandom
+import java.util.Base64
+
 
 const val TAG = "MainActivity"
 
@@ -103,11 +104,11 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding)
                         )
                         Row {
-//                            Button(onClick = {}) { Text("Login + Server") }
+//                          Button(onClick = {}) { Text("Login + Server") }
                             ButtonUI(webClientId)
                         }
                         Row {
-                            Button(onClick = {}) { Text("Live Updates") }
+                            ButtonUI2()
                         }
                         Row {
                             Button(onClick = {}) { Text("Timer") }
@@ -116,10 +117,33 @@ class MainActivity : ComponentActivity() {
 
                         }
 
+                        val client = OkHttpClient()
+                        val request = Request.Builder()
+                            .url("ws://10.0.2.2:8080")
+                            .build()
+                        val listener = EchoWebSocketListener()
+                        val webSocket = client.newWebSocket(request, listener)
+                        Row {
+                            Button(onClick = {webSocket.send("Hello")}) { Text("Send Message") }
+                        }
+
                     }
                 }
 
             }
+        }
+    }
+
+    class EchoWebSocketListener : WebSocketListener() {
+        var data: String = ""
+
+        override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+            //data = bytes
+            data = bytes.toString()
+        }
+
+        fun log_data(): String{
+            return data
         }
     }
 }
@@ -282,11 +306,28 @@ fun ButtonUI(webClientId: String) {
             val intent = Intent(context, MainActivity2::class.java)
             intent.putExtra("displayName", displayName.toString());
             context.startActivity(intent)
-            Toast.makeText(context, displayName, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, displayName, Toast.LENGTH_SHORT).show()
         }
 
     }
     Button(onClick) {Text("Login + Server")}
+
+}
+
+@Composable
+fun ButtonUI2() {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val onClick: () -> Unit = {
+
+        coroutineScope.launch {
+            val intent = Intent(context, MainActivity2::class.java)
+            context.startActivity(intent)
+        }
+
+    }
+    Button(onClick) {Text("Live Updates")}
 
 }
 
@@ -304,3 +345,9 @@ fun ButtonUI(webClientId: String) {
 //        }
 //    }
 //}
+
+
+
+
+
+

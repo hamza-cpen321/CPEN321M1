@@ -35,8 +35,9 @@ android {
         buildConfigField(
             "String",
             "API_BASE_URL",
-            "\"${localProperty("API_BASE_URL", "https://cpen321m1.vercel.app")}\""
+            "\"${localProperty("API_BASE_URL", "http://10.0.2.2:3000")}\""
             //"http://10.0.2.2:3000"
+            //"https://cpen321m1.vercel.app"
         )
         buildConfigField(
             "String",
@@ -90,4 +91,7 @@ dependencies {
     implementation("androidx.credentials:credentials:1.7.0-alpha03")
     implementation("androidx.credentials:credentials-play-services-auth:1.7.0-alpha03")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("org.java-websocket:Java-WebSocket:1.5.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 }

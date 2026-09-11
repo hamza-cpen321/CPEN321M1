@@ -1,5 +1,6 @@
 import { env } from './config/env';
 import express from 'express';
+import WebSocket from 'ws'
 
 const app = express()
 
@@ -50,5 +51,3 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
     });
   });
 }
-
-
