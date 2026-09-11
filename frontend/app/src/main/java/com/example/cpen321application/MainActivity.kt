@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.Alignment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -111,6 +112,9 @@ class MainActivity : ComponentActivity() {
                         Row {
                             Button(onClick = {}) { Text("Timer") }
                         }
+                        Row {
+
+                        }
 
                     }
                 }
@@ -119,7 +123,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun Greeting(apiBaseUrl: String, modifier: Modifier = Modifier) {
@@ -207,12 +210,13 @@ fun generateSecureRandomNonce(byteLength: Int = 32): String {
 }
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-suspend fun signIn(request: GetCredentialRequest, context: Context): Exception? {
+suspend fun signIn(request: GetCredentialRequest, context: Context): Any? {
     val credentialManager = CredentialManager.create(context)
     val failureMessage = "Sign in failed!"
     //using delay() here helps prevent NoCredentialException when the BottomSheet Flow is triggered
     //on the initial running of our app
     delay(250)
+    var displayName: String? = null
     return try {
         // The getCredential is called to request a credential from Credential Manager.
         val result = credentialManager.getCredential(
@@ -225,12 +229,13 @@ suspend fun signIn(request: GetCredentialRequest, context: Context): Exception? 
         if (credential is CustomCredential &&
             credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            displayName = googleIdTokenCredential.displayName
             Log.i(TAG, "Signed in as: ${googleIdTokenCredential.id}")
         }
 
-        Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Sign in successful!" + displayName, Toast.LENGTH_SHORT).show()
         Log.i(TAG, "(☞ﾟヮﾟ)☞  Sign in Successful!  ☜(ﾟヮﾟ☜)")
-        null
+        return displayName
     } catch (e: GoogleIdTokenParsingException) {
         Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
         Log.e(TAG, failureMessage + ": Issue with parsing received GoogleIdToken", e)
@@ -252,6 +257,7 @@ suspend fun signIn(request: GetCredentialRequest, context: Context): Exception? 
         Log.e(TAG, failureMessage + ": Failure getting credentials", e)
         e
     }
+
 }
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -259,6 +265,7 @@ suspend fun signIn(request: GetCredentialRequest, context: Context): Exception? 
 fun ButtonUI(webClientId: String) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    var displayName: String? = null
 
     val onClick: () -> Unit = {
         val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption
@@ -271,8 +278,29 @@ fun ButtonUI(webClientId: String) {
             .build()
 
         coroutineScope.launch {
-            signIn(request, context)
+            displayName = signIn(request, context).toString()
+            val intent = Intent(context, MainActivity2::class.java)
+            intent.putExtra("displayName", displayName.toString());
+            context.startActivity(intent)
+            Toast.makeText(context, displayName, Toast.LENGTH_SHORT).show()
         }
+
     }
-    Button(onClick) {Text("Login")}
+    Button(onClick) {Text("Login + Server")}
+
 }
+
+//// composable with a button
+//@Composable
+//fun IntentExample(context: Context) {
+//    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+//
+//        // Button with an onClick to go to SecondActivity
+//        Button(onClick = {
+//            context.startActivity(Intent(context, MainActivity2::class.java))
+//        }
+//        ) {
+//            Text("Go to Second Activity")
+//        }
+//    }
+//}
