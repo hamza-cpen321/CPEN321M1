@@ -81,7 +81,7 @@ class MainActivity3 : ComponentActivity() {
                                         }
                                     }
                                 }
-                                delay(1000L)
+                                delay(10L)
                             }
                         }
 
@@ -107,15 +107,15 @@ class MainActivity3 : ComponentActivity() {
                                 )
                             }
                         }
-                        Row {
-                            Button(onClick = { webSocket.send("Hello") }) { Text("Send Message") }
-                        }
-                        Row {
-                            Button(onClick = { Log.i(TAG, listener.get_data().toString())}) { Text("Log Message") }
-                        }
-                        Row {
-                            Button(onClick = { Log.i(TAG, "test")}) { Text("test") }
-                        }
+//                        Row {
+//                            Button(onClick = { webSocket.send("Hello") }) { Text("Send Message") }
+//                        }
+//                        Row {
+//                            Button(onClick = { Log.i(TAG, listener.get_data().toString())}) { Text("Log Message") }
+//                        }
+//                        Row {
+//                            Button(onClick = { Log.i(TAG, "test")}) { Text("test") }
+//                        }
                     }
                 }
             }
@@ -128,7 +128,7 @@ class MainActivity3 : ComponentActivity() {
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
             val message = bytes.utf8()
             data = JSONObject(message)
-            Log.i(TAG, data.toString())
+//            Log.i(TAG, data.toString())
         }
 
         fun get_data(): JSONObject{
