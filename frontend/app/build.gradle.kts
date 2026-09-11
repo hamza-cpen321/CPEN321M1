@@ -35,9 +35,9 @@ android {
         buildConfigField(
             "String",
             "API_BASE_URL",
-            "\"${localProperty("API_BASE_URL", "http://10.0.2.2:3000")}\""
+            "\"${localProperty("API_BASE_URL", "https://cpen321m1-gilt.vercel.app")}\""
             //"http://10.0.2.2:3000"
-            //"https://cpen321m1.vercel.app"
+            //"https://cpen321m1-gilt.vercel.app"
         )
         buildConfigField(
             "String",
