@@ -52,7 +52,7 @@ class MainActivity3 : ComponentActivity() {
                         val listener = remember { EchoWebSocketListener() }
                         val webSocket = remember {
                             client.newWebSocket(
-                                Request.Builder().url("ws://10.0.2.2:8080").build(),
+                                Request.Builder().url("wss://cpen321m1-gilt.vercel.app").build(),
                                 listener
                             )
                         }

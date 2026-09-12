@@ -1,9 +1,29 @@
-import { env } from './config/env';
 import express from 'express';
-import WebSocket from 'ws'
+import { createServer } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 
-const app = express()
+const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
+const stream = new WebSocket('wss://8.229.22.124');
 
+stream.on('open', () => {
+    console.log('stream established');
+});
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  ws.on('message', (message) => {
+    console.log(`Received message: ${message}`);
+    ws.send(`Server received your message: ${message}`);
+  });
+  
+  stream.on('message', (data) => {
+    //console.log(`Received message: ${data}`);
+    ws.send(data);
+  });
+});
 app.get('/', (_req, res) => {
   res.send('Hello World!')
 })
@@ -36,18 +56,5 @@ app.get('/serverTime', (req, res) => {
   res.send(`${time} ${timezone}`);
 });
 
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Not Found' });
-});
+server.listen(3000, () => console.log("listening on :3000"));
 
-const server = app.listen(env.port, () => {
-  console.log(`Server listening on port ${env.port}`);
-});
-
-for (const signal of ['SIGINT', 'SIGTERM'] as const) {
-  process.on(signal, () => {
-    server.close(() => {
-      process.exit(0);
-    });
-  });
-}
