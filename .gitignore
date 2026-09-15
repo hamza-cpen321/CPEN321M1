@@ -54,3 +54,7 @@ google-services.json
 .verity/.snapshot/
 backend/src/ignore_index.ts
 .vercel
+frontend/app/debug/output-metadata 3.json
+frontend/app/release/baselineProfiles/0/app-release.dm
+frontend/app/release/output-metadata.json
+frontend/app/release/baselineProfiles/1/app-release.dm
