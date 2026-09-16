@@ -123,4 +123,21 @@ Set at least:
 
 ## Additional Setup
 
-_Please specify any other additional setup steps non-specific to either frontend nor backend_
+Deploy to Vercel:
+
+download Vercel 
+
+    npm i -g vercel
+
+login to vercel
+
+    vercel login
+
+deploy to vercel (make sure you are in ./backend/)
+
+    vercel deploy
+
+deploy to prod
+
+
+    vercel deploy --prod
