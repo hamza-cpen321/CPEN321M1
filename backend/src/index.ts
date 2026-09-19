@@ -1,5 +1,6 @@
 import express from 'express';
 import { createServer } from "http";
+import os from "os";
 import { WebSocketServer, WebSocket } from "ws";
 
 const app = express();
@@ -39,8 +40,12 @@ app.get('/devName', (_req, res) => {
 
 // API to get Server IP address
 app.get('/serverIP', (_req, res) => {
-  const ip = _req.ip;
-  res.send(ip)
+  const interfaces = Object.values(os.networkInterfaces()).flat();
+  const address = interfaces.find(
+    (networkAddress) => networkAddress?.family === 'IPv4' && !networkAddress.internal
+  )?.address;
+
+  res.send(address ?? 'unavailable');
 });
 
 // API to get server local time (hh:mm:ss GMT+hh:mm)

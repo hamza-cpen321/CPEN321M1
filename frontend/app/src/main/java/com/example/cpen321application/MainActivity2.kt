@@ -27,6 +27,8 @@ import com.example.cpen321application.ui.theme.CPEN321ApplicationTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
+import java.net.Inet4Address
+import java.net.NetworkInterface
 import java.net.URL
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -56,9 +58,7 @@ class MainActivity2 : ComponentActivity() {
                             apiBaseUrl = BuildConfig.API_BASE_URL,
                             modifier = Modifier.padding(innerPadding)
                         )
-                        Text(
-                            text = localIpAddress().toString()
-                        )
+                        ClientIpText()
                         Greeting4(
                             apiBaseUrl = BuildConfig.API_BASE_URL,
                             modifier = Modifier.padding(innerPadding)
@@ -69,6 +69,17 @@ class MainActivity2 : ComponentActivity() {
             }
         }
     }
+}
+
+@Composable
+private fun ClientIpText() {
+    var clientIp by remember { mutableStateOf("Client IP: checking...") }
+
+    LaunchedEffect(Unit) {
+        clientIp = "Client IP: ${localIpAddress() ?: "unavailable"}"
+    }
+
+    Text(text = clientIp)
 }
 
 @Composable
@@ -126,24 +137,13 @@ fun localDateTime() {
     )
 }
 
-@Composable
-fun localIpAddress(): String? {
-    var ip: String? = null
-    val thread = Thread {
-        try {
-            val url = URL("https://api.ipify.org")
-            val connection = url.openConnection()
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0") // Set a User-Agent to avoid HTTP 403 Forbidden error
-            val inputStream = connection.getInputStream()
-            val s = java.util.Scanner(inputStream, "UTF-8").useDelimiter("\\A")
-            ip = s.next()
-            inputStream.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-    thread.start()
-    return ip
+private suspend fun localIpAddress(): String? = withContext(Dispatchers.IO) {
+    NetworkInterface.getNetworkInterfaces()
+        ?.asSequence()
+        ?.flatMap { networkInterface -> networkInterface.inetAddresses.asSequence() }
+        ?.filterIsInstance<Inet4Address>()
+        ?.firstOrNull { !it.isLoopbackAddress && !it.isLinkLocalAddress }
+        ?.hostAddress
 }
 
 private suspend fun fetchDevName(apiBaseUrl: String): String = withContext(Dispatchers.IO) {
