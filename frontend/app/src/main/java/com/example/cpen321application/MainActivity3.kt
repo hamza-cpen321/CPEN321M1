@@ -52,7 +52,7 @@ class MainActivity3 : ComponentActivity() {
                         val listener = remember { EchoWebSocketListener() }
                         val webSocket = remember {
                             client.newWebSocket(
-                                Request.Builder().url("wss://cpen321m1-gilt.vercel.app").build(),
+                                Request.Builder().url("wss://${BuildConfig.API_BASE_URL.removePrefix("https://")}").build(),
                                 listener
                             )
                         }
@@ -128,7 +128,7 @@ class MainActivity3 : ComponentActivity() {
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
             val message = bytes.utf8()
             data = JSONObject(message)
-//            Log.i(TAG, data.toString())
+            //Log.i(TAG, data.toString())
         }
 
         fun get_data(): JSONObject{
