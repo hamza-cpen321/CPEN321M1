@@ -14,12 +14,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -57,66 +61,32 @@ import java.util.Base64
 
 const val TAG = "MainActivity"
 
-//class MainActivity : ComponentActivity() {
-//    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        //replace with your own web client ID from Google Cloud Console
-//        val webClientId = "YOUR_CLIENT_ID_HERE"
-//
-//        setContent {
-//            //ExampleTheme - this is derived from the name of the project not any added library
-//            //e.g. if this project was named "Testing" it would be generated as TestingTheme
-//            CPEN321ApplicationTheme {
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background,
-//                ) {
-//                    //This will trigger on launch
-//                    BottomSheet(webClientId)
-//                }
-//            }
-//        }
-//    }
-//}
-
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val webClientId = "254516310392-hvpmhpee3au6ke44ohcjpln1m827fobt.apps.googleusercontent.com"
-
         setContent {
             CPEN321ApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Greeting(
-                            apiBaseUrl = BuildConfig.API_BASE_URL,
+//                        Greeting(
+//                            apiBaseUrl = BuildConfig.API_BASE_URL,
+//                            modifier = Modifier.padding(innerPadding)
+//                        )
+                        MainScreen(
                             modifier = Modifier.padding(innerPadding)
                         )
-                        Row {
-//                          Button(onClick = {}) { Text("Login + Server") }
-                            ButtonUI(webClientId)
-                        }
-                        Row {
-                            ButtonUI2()
-                        }
-                        Row {
-                            ButtonUI3()
-                        }
                     }
                 }
-
             }
         }
     }
 }
-
 
 @Composable
 fun Greeting(apiBaseUrl: String, modifier: Modifier = Modifier) {
@@ -130,6 +100,31 @@ fun Greeting(apiBaseUrl: String, modifier: Modifier = Modifier) {
         text = statusText,
         modifier = modifier
     )
+}
+
+@Composable
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+fun MainScreen(modifier: Modifier = Modifier) {
+
+    val webClientId = "254516310392-hvpmhpee3au6ke44ohcjpln1m827fobt.apps.googleusercontent.com"
+
+    Column(
+        modifier = modifier.fillMaxSize().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row {
+            ButtonUI(webClientId)
+        }
+        Row {
+            ButtonUI2()
+        }
+        Row {
+            ButtonUI3()
+        }
+
+
+    }
 }
 
 private suspend fun fetchHealthStatus(apiBaseUrl: String): String = withContext(Dispatchers.IO) {
@@ -317,22 +312,6 @@ fun ButtonUI3() {
     Button(onClick) {Text("Timer")}
 
 }
-
-//// composable with a button
-//@Composable
-//fun IntentExample(context: Context) {
-//    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-//
-//        // Button with an onClick to go to SecondActivity
-//        Button(onClick = {
-//            context.startActivity(Intent(context, MainActivity2::class.java))
-//        }
-//        ) {
-//            Text("Go to Second Activity")
-//        }
-//    }
-//}
-
 
 
 
