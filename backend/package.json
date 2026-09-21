@@ -24,7 +24,7 @@
     "hono": "^4.13.7",
     "ip": "^2.0.1",
     "script": "^0.1.4",
-    "vercel": "^59.15.1"
+    "vercel": "^59.23.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
