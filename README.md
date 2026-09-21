@@ -1,4 +1,4 @@
-# CPEN321_26W1_ProjectName
+# CPEN321_26W1_M1
 
 _Keep this README up to date with the steps required to build and run the frontend and backend (including any scripts, config files, and environment variables). TAs ill follow these instructions._
 
@@ -121,23 +121,52 @@ Set at least:
    docker compose down
    ```
 
+### Option 3: Run Bash Script
+
+From the project root, run `./scripts/run-backend.sh`.
+
 ## Additional Setup
 
-Deploy to Vercel:
+### Deploy to Vercel (optional)
 
-download Vercel 
+Download Vercel:
 
-    npm i -g vercel
+```bash
+npm i -g vercel
+```
 
-login to vercel
+Log in to Vercel:
 
-    vercel login
+```bash
+vercel login
+```
 
-deploy to vercel (make sure you are in ./backend/)
+Deploy to Vercel. Make sure you are in `./backend/`:
 
-    vercel deploy
+```bash
+vercel deploy
+```
 
-deploy to prod
+Deploy to production:
 
+```bash
+vercel deploy --prod
+```
 
-    vercel deploy --prod
+Remember to update `local.properties` with:
+
+```properties
+API_BASE_URL=yourDomain.vercel.app
+```
+
+You will also need to change `MainActivity4.kt` for TLS security:
+
+```kotlin
+"ws://${BuildConfig.API_BASE_URL.removePrefix(\"http://\")}"
+```
+
+to:
+
+```kotlin
+"wss://${BuildConfig.API_BASE_URL.removePrefix(\"https://\")}"
+```
