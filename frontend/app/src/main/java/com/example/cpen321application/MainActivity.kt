@@ -106,7 +106,7 @@ fun Greeting(apiBaseUrl: String, modifier: Modifier = Modifier) {
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 fun MainScreen(modifier: Modifier = Modifier) {
 
-    val webClientId = "254516310392-hvpmhpee3au6ke44ohcjpln1m827fobt.apps.googleusercontent.com"
+    val webClientId = BuildConfig.GOOGLE_CLIENT_ID
 
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),

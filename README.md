@@ -34,6 +34,7 @@ Install the following before the frontend or backend setup steps:
    Set at least:
    - `sdk.dir`: path to your Android SDK. Android Studio usually writes this the first time you open `frontend/`. On Mac it is often `sdk.dir=/Users/<username>/Library/Android/sdk`.
    - `API_BASE_URL`: backend URL baked into the APK. Use `http://10.0.2.2:3000` for the emulator (`10.0.2.2` is the host machine). For a physical device on the same Wi-Fi, use `http://<your-lan-ip>:3000`.
+   - `GOOGLE_CLIENT_ID`: Google OAuth web client ID used for sign-in.
 
 
 ### Build and Run
@@ -67,6 +68,7 @@ Set at least:
 - `JWT_SECRET`: a long random string used to sign auth tokens.
 - `MONGODB_URI`: only needed for local development (default in `.env.example` assumes MongoDB on `localhost:27017`). Ignored when running via Docker Compose.
 - `PORT` (optional): defaults to `3000` if unset.
+- `VERCEL_TOKEN`: your Vercel access token, required when deploying through the Vercel CLI.
 
 
 ### Option 1: Run locally
@@ -74,6 +76,7 @@ Set at least:
 **Requirements:** 
 - [Node.js](https://nodejs.org/en/download/) 22+
 - [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) 10+
+- Vercel CLI (for deployment): install it with `npm install -g vercel`
 
 **Setup:** 
 1. Install dependencies:
@@ -101,6 +104,7 @@ Set at least:
 **Requirements:** 
 - [Docker](https://docs.docker.com/desktop/setup/install) and [Docker Compose](https://docs.docker.com/desktop/setup/install) v2.24+
 - [curl](https://curl.se/download.html)
+- Vercel CLI (for deployment): install it with `npm install -g vercel`
 
 **Setup**
 1. **Start** (from the project root):
@@ -120,53 +124,3 @@ Set at least:
    ```bash
    docker compose down
    ```
-
-### Option 3: Run Bash Script
-
-From the project root, run `./scripts/run-backend.sh`.
-
-## Additional Setup
-
-### Deploy to Vercel (optional)
-
-Download Vercel:
-
-```bash
-npm i -g vercel
-```
-
-Log in to Vercel:
-
-```bash
-vercel login
-```
-
-Deploy to Vercel. Make sure you are in `./backend/`:
-
-```bash
-vercel deploy
-```
-
-Deploy to production:
-
-```bash
-vercel deploy --prod
-```
-
-Remember to update `local.properties` with:
-
-```properties
-API_BASE_URL=yourDomain.vercel.app
-```
-
-You will also need to change `MainActivity4.kt` for TLS security:
-
-```kotlin
-"ws://${BuildConfig.API_BASE_URL.removePrefix(\"http://\")}"
-```
-
-to:
-
-```kotlin
-"wss://${BuildConfig.API_BASE_URL.removePrefix(\"https://\")}"
-```

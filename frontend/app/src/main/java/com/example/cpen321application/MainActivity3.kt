@@ -52,7 +52,7 @@ class MainActivity3 : ComponentActivity() {
                         val listener = remember { EchoWebSocketListener() }
                         val webSocket = remember {
                             client.newWebSocket(
-                                Request.Builder().url("ws://${BuildConfig.API_BASE_URL.removePrefix("http://")}").build(),
+                                Request.Builder().url("wss://${BuildConfig.API_BASE_URL.removePrefix("https://")}").build(),
                                 listener
                             )
                         }

@@ -35,12 +35,12 @@ android {
         buildConfigField(
             "String",
             "API_BASE_URL",
-            "\"${localProperty("API_BASE_URL", "http://10.0.2.2:3000")}\""
+            "\"${localProperty("API_BASE_URL", "https://cpen321m1.vercel.app")}\""
         )
         buildConfigField(
             "String",
             "GOOGLE_CLIENT_ID",
-            "\"${localProperty("GOOGLE_CLIENT_ID")}\""
+            "\"${localProperty("GOOGLE_CLIENT_ID", "254516310392-hvpmhpee3au6ke44ohcjpln1m827fobt.apps.googleusercontent.com")}\""
         )
     }
 
